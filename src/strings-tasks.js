@@ -147,7 +147,10 @@ function repeatString(str, times) {
  *   removeFirstOccurrences('ABABAB', 'BA') => 'ABAB'.
  */
 function removeFirstOccurrences(str, value) {
-  return str.replace(value, '');
+  return str.indexOf(value) !== -1
+    ? str.substring(0, str.indexOf(value)) +
+        str.substring(str.indexOf(value) + value.length)
+    : str;
 }
 
 /**
@@ -163,7 +166,10 @@ function removeFirstOccurrences(str, value) {
  *   removeLastOccurrences('ABABAB', 'BA') => 'ABAB'.
  */
 function removeLastOccurrences(str, value) {
-  return [...str.matchAll(value)];
+  return str.lastIndexOf(value) !== -1
+    ? str.substring(0, str.lastIndexOf(value)) +
+        str.substring(str.lastIndexOf(value) + value.length)
+    : str;
 }
 
 /**
@@ -179,16 +185,14 @@ function removeLastOccurrences(str, value) {
  *   sumOfCodes() => 0
  */
 function sumOfCodes(str) {
-  const initialValue = 0;
-  return typeof str === 'string'
-    ? str
-        .split('')
-        .reduce(
-          (accumulator, currentValue) =>
-            accumulator + String.charCodeAt(currentValue),
-          initialValue
-        )
-    : 0;
+  const arr =
+    typeof str === 'string'
+      ? str.split('').map((el, index) => str.charCodeAt(index))
+      : 0;
+  return Array.from(arr).reduce(
+    (accumulator, currentValue) => accumulator + currentValue,
+    0
+  );
 }
 
 /**
@@ -266,7 +270,7 @@ function reverseString(str) {
  *   orderAlphabetically('abc123xyz') => '123abcxyz'
  */
 function orderAlphabetically(str) {
-  return str.split('').toSorted().join('');
+  return str.split('').sort().join('');
 }
 
 /**
@@ -321,7 +325,10 @@ function countVowels(str) {
  *   isPalindrome('No lemon, no melon') => true
  */
 function isPalindrome(str) {
-  return str === str.split('').reverse().join('');
+  return (
+    str.replaceAll(/[\W_]/g, '').toLowerCase() ===
+    str.replaceAll(/[\W_]/g, '').toLowerCase().split('').reverse().join('')
+  );
 }
 
 /**
@@ -337,10 +344,11 @@ function isPalindrome(str) {
  *   findLongestWord('No words here') => 'words'
  */
 function findLongestWord(sentence) {
-  return sentence
+  const l = sentence
     .split(' ')
     .sort((a, b) => a.length - b.length)
     .reverse()[0];
+  return sentence.split(' ').filter((el) => el.length === l.length)[0];
 }
 
 /**
@@ -372,7 +380,12 @@ function reverseWords(str) {
  *   invertCase('12345') => '12345'
  */
 function invertCase(str) {
-  return str.split('').map((el) => el);
+  return str
+    .split('')
+    .map((el) =>
+      el.search(/[A-Z]/g) === -1 ? el.toUpperCase() : el.toLowerCase()
+    )
+    .join('');
 }
 
 /**
@@ -457,9 +470,14 @@ function extractEmails(str) {
  *
  */
 function encodeToRot13(str) {
-  const arr = [];
-  for (let i = 0; i < str.length; i += 1) arr[i] = str.charCodeAt(i) + 13;
-  return arr.map((el) => String.fromCharCode(el)).join('');
+  const initial = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const encoded = 'nopqrstuvwxyzabcdefghijklmNOPQRSTUVWXYZABCDEFGHIJKLM';
+  const arr = str
+    .split('')
+    .map((el) => (initial.indexOf(el) === -1 ? el : initial.indexOf(el)));
+  return arr
+    .map((el) => (typeof el === 'number' ? encoded.charAt(el) : el))
+    .join('');
 }
 
 /**
